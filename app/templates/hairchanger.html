@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Hair Changer AI{% endblock %}
+
+{% block content %}
+<div id="message">
+
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div id="upload-card" class="card shadow rounded-4 p-4 border-0">
+                <h1 class="text-center text-primary mb-3 headed">Hair Changer AI</h1>
+                <p class="text-center mb-4">Upload an image and change your hairstyle using AI!</p>
+
+                <form id="hair-form" class="needs-validation" novalidate>
+                    {% for field in form %}
+                        {% if field.name != 'task_type' and field.name != 'csrf_token' %}
+                        <div class="mb-3">
+                            {{ field.label(class="form-label") }}
+
+                            {% if field.type == 'FileField' %}
+                                {{ field(class="form-control rounded-3", accept=field.accept if field.accept else "") }}
+                            {% else %}
+                                {{ field(class="form-control rounded-3" + (" is-invalid" if field.errors else "")) }}
+                            {% endif %}
+
+                            {% if field.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in field.errors %}
+                                        {{ error }}<br>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {% if field.description %}
+                                <div class="form-text">{{ field.description }}</div>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                            {% if field.name == 'csrf_token' %}
+                                {{ field }}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary rounded-3" id="submit-btn">
+                            <i class="bi bi-upload me-2"></i>Upload and Process
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="loading-card" class="card shadow rounded-4 p-4 border-0 text-center d-none" style="background-color: #f8f9fa; height: 60vh;">
+                <div class="d-flex flex-column justify-content-center align-items-center h-100">
+                    <div class="loader mb-3">
+                        <div class="spinner"></div>
+                        <div class="spinner"></div>
+                        <div class="spinner"></div>
+                    </div>
+                    <div class="progress w-100 mb-3" style="height: 1rem;">
+                        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-pink" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+
+                    <script>
+                        const progressBar = document.getElementById("progress-bar");
+                        let progress = 0;
+
+                        const interval = setInterval(() => {
+                            progress += 1;
+                            progressBar.style.width = `${progress}%`;
+                            progressBar.setAttribute("aria-valuenow", progress);
+
+                            if (progress >= 100) {
+                                clearInterval(interval);
+                            }
+                        }, 100); // 100ms * 100 = 10 seconds
+                    </script>
+                    <style>
+                        .loader {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            gap: 0.5rem;
+                        }
+                        .spinner {
+                            width: 1rem;
+                            height: 1rem;
+                            background-color: rgb(255, 133, 153); /* Color of the bouncing dots */
+                            border-radius: 50%;
+                            animation: bounce 1.5s infinite ease-in-out;
+                        }
+                        .spinner:nth-child(2) {
+                            animation-delay: 0.3s;
+                        }
+                        .spinner:nth-child(3) {
+                            animation-delay: 0.6s;
+                        }
+                        @keyframes bounce {
+                            0%, 80%, 100% {
+                                transform: scale(0);
+                            }
+                            40% {
+                                transform: scale(1);
+                            }
+                        }
+                    </style>
+                    <h5 class="text-primary">Model generating image...</h5>
+                </div>
+            </div>
+
+            <div id="result-card" class="card shadow rounded-4 p-4 border-0 text-center d-none">
+                <h4 class="text-success mb-3" id="result-message">Hairstyle changed successfully!</h4>
+                <img id="result-image" src="" alt="Processed Image" class="img-fluid rounded-3 shadow mb-3" style="max-height: 400px; max-width: 100%; object-fit: contain;">
+                <button class="btn btn-outline-primary rounded-3" onclick="location.reload()">Try Again</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById("hair-form");
+    const uploadCard = document.getElementById("upload-card");
+    const loadingCard = document.getElementById("loading-card");
+    const resultCard = document.getElementById("result-card");
+    const resultImage = document.getElementById("result-image");
+    const resultMessage = document.getElementById("result-message");
+
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        // Prepare form data
+        const formData = new FormData(form);
+
+        // Show loading state
+        uploadCard.classList.add("d-none");
+        loadingCard.classList.remove("d-none");
+
+        try {
+            const response = await fetch("", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            // Show result
+            loadingCard.classList.add("d-none");
+            resultImage.src = data.result_image_url;
+            resultMessage.textContent = data.message || "Image generated!";
+            resultCard.classList.remove("d-none");
+
+        } catch (error) {
+            console.error("Error:", error);
+            loadingCard.classList.add("d-none");
+            uploadCard.classList.remove("d-none");
+            document.getElementById("message").innerHTML = '<div class="alert alert-danger" role="alert">An error occurred while processing your request. Please try again.</div>';
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow rounded-4 p-4 border-0">
+        <h2 class="text-center mb-4 headed">Register</h2>
+
+        <form method="POST">
+          {{ form.hidden_tag() }}
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            {{ form.email(class="form-control rounded-3", placeholder="Enter your email") }}
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            {{ form.password(class="form-control rounded-3", placeholder="Enter password") }}
+          </div>
+
+          <div class="mb-4">
+            <label for="confirm_password" class="form-label">Confirm Password</label>
+            {{ form.confirm_password(class="form-control rounded-3", placeholder="Confirm password") }}
+          </div>
+          <div class="mb-3 text-muted">
+            <!-- Don't have an account?<strong> <a href="{{ url_for('auth.register') }}" style="color: rgb(248, 33, 68);">Register here</a>.</strong> -->
+            Already have an account? <strong> <a href="{{ url_for('auth.login') }}" style="color: rgb(248, 33, 68);">Login here</a>.</strong>
+        </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary rounded-3" style="background-color:pink !important; color: black; border-color: pink;">Register</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

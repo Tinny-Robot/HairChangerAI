@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow rounded-4 p-4 border-0">
+                <h2 class="text-center mb-4 headed">Login</h2>
+                
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        {{ form.email(class="form-control rounded-3", id="email") }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        {{ form.password(class="form-control rounded-3", id="password") }}
+                    </div>
+
+                    {% if form.email.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.email.errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if form.password.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.password.errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if form.csrf_token.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.csrf_token.errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-3 text-muted">
+                        Don't have an account?<strong> <a href="{{ url_for('auth.register') }}" style="color: rgb(248, 33, 68);">Register here</a>.</strong>
+                    </div>
+
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-primary rounded-3") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
